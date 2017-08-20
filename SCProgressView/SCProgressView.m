@@ -110,6 +110,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
+    [self updateProgressLayer];
     if (self.showsPopUpview) {
         [self updatePopUpView];
     }
@@ -135,36 +136,36 @@
 
 
 - (void)updateProgressLayer {
-    NSLog(@"%s", __FUNCTION__);
+    NSLog(@"============%g", self.bounds.size.width * self.progress);
     _gradientLayer.frame = self.bounds;
     _progressLayer.frame = CGRectMake(0, 0, self.bounds.size.width * self.progress, self.bounds.size.height);
 }
 
 
 - (void)updatePopUpView {
-    NSLog(@"%s", __FUNCTION__);
+    
     
     NSString *progressString = [self.dataSource progressView:self stringForProgress:self.progress];
     if (progressString.length == 0) progressString = @"???"; // replacement for blank string
     
     CGSize popUpViewSize = [self.popUpView popUpSizeForString:progressString];
     
-    // calculate the popUpView frame
+    // 计算 popUpView 的 frame
     CGRect bounds = self.bounds;
     CGFloat xPos = (CGRectGetWidth(bounds) * self.progress) - popUpViewSize.width/2;
     
     CGRect popUpRect = CGRectMake(xPos, CGRectGetMinY(bounds)-popUpViewSize.height,
                                   popUpViewSize.width, popUpViewSize.height);
     
-    // determine if popUpRect extends beyond the frame of the progress view
-    // if so adjust frame and set the center offset of the PopUpView's arrow
-    CGFloat minOffsetX = CGRectGetMinX(popUpRect);
-    CGFloat maxOffsetX = CGRectGetMaxX(popUpRect) - CGRectGetWidth(bounds);
+    // 检测 popUpRect 是否超出 progress view 的边界
+    CGFloat minOffsetX = CGRectGetMinX(popUpRect);                              // 距离最左边边界的距离
+    CGFloat maxOffsetX = CGRectGetMaxX(popUpRect) - CGRectGetWidth(bounds);     // 距离最右边边界的距离
     
-    CGFloat offset = minOffsetX < 0.0 ? minOffsetX : (maxOffsetX > 0.0 ? maxOffsetX : 0.0);
-    popUpRect.origin.x -= offset;
+    CGFloat arrowOffset = minOffsetX < 0.0 ? minOffsetX : (maxOffsetX > 0.0 ? maxOffsetX : 0.0);
+    popUpRect.origin.x -= arrowOffset;
     
-    [self.popUpView setFrame:popUpRect arrowOffset:offset colorOffset:self.progress text:progressString];
+    NSLog(@"----------%g", CGRectGetWidth(bounds) * self.progress);
+    [self.popUpView setFrame:popUpRect arrowOffset:arrowOffset colorOffset:self.progress text:progressString];
     
 }
 
